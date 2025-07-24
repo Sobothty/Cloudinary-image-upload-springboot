@@ -1,6 +1,7 @@
 package com.example.image_upload.controller;
 
 
+import com.example.image_upload.dto.ImageResponse;
 import com.example.image_upload.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,19 +20,20 @@ public class CloudinaryController {
     private final CloudinaryService cloudinaryService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadToCloudinary(@RequestParam("file") MultipartFile file){
-        try{
-            String uploadUrl = cloudinaryService.uploadFile(file);
+    public ResponseEntity<?> uploadToCloudinary(@RequestParam("file") MultipartFile file) {
+        try {
+            ImageResponse response = cloudinaryService.uploadFile(file);
+
             return new ResponseEntity<>(
                     Map.of(
-                            "image_url", uploadUrl,
+                            "image_url", response.imageUrl(),
+                            "public_id", response.publicId(),
                             "timestamp", LocalDate.now()
                     ),
                     HttpStatus.OK
             );
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
         }
-
     }
 }
